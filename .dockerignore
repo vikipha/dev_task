@@ -1,0 +1,4 @@
+.idea
+.data
+**/.mypy_cache
+**/.pytest_cache

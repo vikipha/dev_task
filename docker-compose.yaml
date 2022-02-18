@@ -1,0 +1,40 @@
+version: "3.4"
+
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    env_file:
+      - env/pdfservice.env
+    command: /opt/bin/run_server.sh
+    working_dir: /opt/pdf_service
+    image: pdfservice
+    ports:
+      - 9000:8000
+    volumes:
+      - pdfservice_data:/data
+      # For the testing purposes may be handy to mount your code directory into running docker container.
+      # - <your working directory>/pdf_service/pdf_service:/opt/pdf_service
+    restart: on-failure
+    depends_on:
+      - postgres
+
+  postgres:
+    image: 'bitnami/postgresql:latest'
+    ports:
+      - '5488:5432'
+    env_file:
+      - env/postgresql.env
+    volumes:
+      - 'pdfservice_psql:/bitnami/postgresql'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  pdfservice_psql:
+  pdfservice_data:
